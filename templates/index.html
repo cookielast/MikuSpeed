@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>MikuSpeed</title>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>MikuSpeed</h1>
+            <p class="subtitle">Test your internet speed with MikuSpeed!</p>
+        </header>
+
+        <main class="content">
+            <div class="miku-container">
+                <img src="{{ url_for('static', filename='miku.gif') }}" alt="Miku Animation" class="miku-image">
+            </div>
+
+            <div class="controls">
+                <select id="server-select">
+                    {% for server in servers %}
+                        <option value="{{ server.id }}">{{ server.name }}</option>
+                    {% endfor %}
+                </select>
+                <button id="start-speedtest" class="start-button">
+                    <span>Start MikuSpeed!</span>
+                    <svg class="button-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="console">
+                <p id="console-text">💜 > Miku is ready!</p>
+                <div id="results" class="results">
+                    <p><strong>IP:</strong> <span id="ip">-</span></p>
+                    <p><strong>Ping:</strong> <span id="ping">-</span> ms</p>
+                    <p><strong>Download:</strong> <span id="download">-</span> Mbps</p>
+                    <p><strong>Upload:</strong> <span id="upload">-</span> Mbps</p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p class="footer-text">Made by <a href="https://github.com/cookielast" target="_blank" class="footer-link">cookielast</a></p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('start-speedtest').addEventListener('click', () => {
+            const consoleText = document.getElementById('console-text');
+            const results = document.getElementById('results');
+            const ip = document.getElementById('ip');
+            const ping = document.getElementById('ping');
+            const download = document.getElementById('download');
+            const upload = document.getElementById('upload');
+
+            const serverSelect = document.getElementById('server-select');
+
+            consoleText.textContent = '💜 > Testing your internet speed...';
+            results.style.display = 'none';
+
+            const eventSource = new EventSource('/stream');
+
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+
+                if (data.ip) {
+                    ip.textContent = data.ip;
+                }
+                if (data.ping) {
+                    ping.textContent = data.ping;
+                }
+                if (data.download) {
+                    download.textContent = data.download;
+                }
+                if (data.upload) {
+                    upload.textContent = data.upload;
+                }
+
+                results.style.display = 'block';
+            };
+
+            eventSource.onerror = () => {
+                consoleText.textContent = '💜 > Speedtest complete!';
+                eventSource.close();
+            };
+        });
+    </script>
+</body>
+</html>
