@@ -52,10 +52,6 @@ To run MikuSpeed locally, follow these steps:
 ## Screenshots 📸
 
 ![Screenshot 1](screenshots/1.png)
-*Main interface of MikuSpeed.*
-
-![Screenshot 2](screenshots/2.png)
-*Real-time speed test results.*
 
 ---
 
